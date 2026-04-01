@@ -1,0 +1,441 @@
+"use client";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+} from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useToursContext } from "@/context/ToursContext";
+import { toast } from "react-toastify";
+import {
+  cityImages,
+  categoryImages,
+  defaultImage,
+} from "@/lib/constants/images";
+
+// ✅ أداة مساعدة لتوحيد القيم بالإنجليزية
+const normalizeToEnglish = (nameObj) => {
+  if (!nameObj) return "";
+  return nameObj.en?.toLowerCase().trim() || "";
+};
+// ✅ إنشاء السياق
+const FilterContext = createContext();
+
+// ✅ المزود الرئيسي للفلاتر
+export const FilterProvider = ({ children }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const locale = pathname.split("/")[1] || "en";
+  const { tours } = useToursContext();
+  // ------------------------------------------------------------
+  // ✅ قراءة القيم من الكويري
+  const cityFromQuery = searchParams.get("destination") || "";
+  const categoryFromQuery = searchParams.get("category") || "";
+  const dateFromQuery = searchParams.get("date") || "";
+  const minPrice = parseInt(searchParams.get("minPrice") || "0");
+  const maxPrice = parseInt(searchParams.get("maxPrice") || "14000");
+  const durationFromQuery = parseInt(searchParams.get("duration") || "10");
+  const searchFromQuery = searchParams.get("search") || "";
+  // ------------------------------------------------------------
+  // ✅ حالات الفلاتر
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [viewMode, setViewMode] = useState("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+  const [sortBy, setSortBy] = useState("alphabetical");
+  // ------------------------------------------------------------
+  // ✅ حالة فتح/إغلاق الـ Accordion للوجهات
+  const [expanded, setExpanded] = useState(false);
+
+  const [selectedDestinations, setSelectedDestinations] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [priceRange, setPriceRange] = useState([minPrice, maxPrice]);
+  const [durationRange, setDurationRange] = useState([0, durationFromQuery]);
+  const [date, setDate] = useState(dateFromQuery);
+  const [searchText, setSearchText] = useState(searchFromQuery);
+  const [expandedCategories, setExpandedCategories] = useState(false);
+
+  // ✅ Popover للمدة
+  const [openDuration, setOpenDuration] = useState(false);
+  const [anchorElDuration, setAnchorElDuration] = useState(null);
+  const handleDurationClick = (event) => {
+    setAnchorElDuration(event.currentTarget);
+    setOpenDuration(true);
+  };
+  const handleDurationClose = () => {
+    setAnchorElDuration(null);
+    setOpenDuration(false);
+  };
+
+  // ✅ Popover للسعر
+  const [openPrice, setOpenPrice] = useState(false);
+  const [anchorElPrice, setAnchorElPrice] = useState(null);
+  const handlePriceClick = (event) => {
+    setAnchorElPrice(event.currentTarget);
+    setOpenPrice(true);
+  };
+  const handlePriceClose = () => {
+    setAnchorElPrice(null);
+    setOpenPrice(false);
+  };
+
+  // ------------------------------------------------------------
+  // ✅ تحديث الحالات من الكويري عند أول تحميل
+  useEffect(() => {
+    if (cityFromQuery && cityFromQuery.toLowerCase() !== "all") {
+      setSelectedDestinations(
+        cityFromQuery
+          .split(",")
+          .filter(Boolean)
+          .map((c) => c.toLowerCase()),
+      );
+    }
+    if (categoryFromQuery && categoryFromQuery.toLowerCase() !== "all") {
+      setSelectedCategories(
+        categoryFromQuery
+          .split(",")
+          .filter(Boolean)
+          .map((c) => c.trim().toLowerCase()),
+      );
+    }
+  }, [cityFromQuery, categoryFromQuery]);
+
+  // ------------------------------------------------------------
+  // ✅ التحقق من صحة الحقول
+  const validateFields = () => {
+    if (!selectedDestinations.length) {
+      toast.error("❌ برجاء اختيار الوجهة (Destination)");
+      return false;
+    }
+    if (!durationRange[1]) {
+      toast.error("❌ برجاء اختيار مدة الرحلة (Duration)");
+      return false;
+    }
+    if (!selectedCategories.length) {
+      toast.error("❌ برجاء اختيار الفئة (Category)");
+      return false;
+    }
+    if (!date) {
+      toast.error("❌ برجاء اختيار التاريخ (Date)");
+      return false;
+    }
+    if (!priceRange || priceRange.length !== 2) {
+      toast.error("❌ برجاء تحديد نطاق السعر (Price Range)");
+      return false;
+    }
+    return true;
+  };
+
+  // ------------------------------------------------------------
+  // ✅ تحديث الكويري عند تغيير الفلاتر
+  const updateQueryParams = () => {
+    const query = new URLSearchParams({
+      destination: selectedDestinations.join(","),
+      category: selectedCategories.join(","),
+      date,
+      duration: durationRange[1].toString(),
+      minPrice: priceRange[0].toString(),
+      maxPrice: priceRange[1].toString(),
+      search: searchText || "All",
+    }).toString();
+
+    router.push(`${pathname}?${query}`, { scroll: false });
+  };
+
+  // ------------------------------------------------------------
+  // ✅ البحث
+  const handleSearch = () => {
+    if (!validateFields()) return;
+
+    const query = new URLSearchParams({
+      destination: selectedDestinations.join(","),
+      duration: durationRange[1].toString(),
+      category: selectedCategories.join(","),
+      date,
+      minPrice: priceRange[0].toString(),
+      maxPrice: priceRange[1].toString(),
+      search: `${selectedDestinations.join(" ")} ${selectedCategories.join(" ")}`,
+    }).toString();
+
+    router.push(`/tours?${query}`);
+  };
+
+  // ------------------------------------------------------------
+  // ✅ دالة موحدة لتبديل الاختيارات
+  const toggleSelection = (list, setList, value, allValues = []) => {
+    const normalized = value.toLowerCase();
+    let updated;
+    if (value === "ALL") {
+      updated = allValues.map((v) => v.toLowerCase());
+    } else {
+      updated = list.includes(normalized)
+        ? list.filter((item) => item !== normalized)
+        : [...list, normalized];
+    }
+    setList(updated);
+    updateQueryParams();
+  };
+
+  const handleToggleCity = (cityNameObj) => {
+    const englishName = normalizeToEnglish(cityNameObj);
+    let updated;
+    if (selectedDestinations.includes(englishName)) {
+      updated = selectedDestinations.filter((d) => d !== englishName);
+    } else {
+      updated = [...selectedDestinations, englishName];
+    }
+    setSelectedDestinations(updated);
+    updateQueryParams();
+  };
+
+  const handleToggleCategory = (categoryName, allCategories = []) =>
+    toggleSelection(
+      selectedCategories,
+      setSelectedCategories,
+      categoryName.trim().toLowerCase(),
+      allCategories.map((c) => c.trim().toLowerCase()),
+    );
+
+  const handleToggle = (cityName) => {
+    const normalized = cityName.toLowerCase();
+    let updated;
+    if (selectedDestinations.includes(normalized)) {
+      updated = selectedDestinations.filter((d) => d !== normalized);
+    } else {
+      updated = [...selectedDestinations, normalized];
+    }
+    setSelectedDestinations(updated);
+    updateQueryParams(); // ✅ مهم: حدّث الكويري بعد التبديل
+  };
+
+  // ------------------------------------------------------------
+  // ✅ فلترة الرحلات مباشرة بناءً على الفلاتر
+  const filteredTours = useMemo(() => {
+    if (!tours || tours.length === 0) return [];
+
+    const destinationsSet = new Set(selectedDestinations);
+    const categoriesSet = new Set(selectedCategories);
+
+    return tours.filter((tour) => {
+      const tourCity = (tour.city?.name || tour.city || "").toLowerCase();
+      const tourCategory = (
+        tour.category?.name ||
+        tour.category ||
+        ""
+      ).toLowerCase();
+
+      const matchesSearch =
+        !searchText ||
+        searchText === "All" ||
+        (typeof tour.title === "string"
+          ? tour.title.toLowerCase().includes(searchText.toLowerCase())
+          : (tour.title?.[locale] || tour.title?.en || "")
+              .toLowerCase()
+              .includes(searchText.toLowerCase()));
+
+      const matchesCity =
+        destinationsSet.size === 0 || destinationsSet.has(tourCity);
+
+      const matchesCategory =
+        categoriesSet.size === 0 || categoriesSet.has(tourCategory);
+
+      return matchesCity && matchesCategory && matchesSearch;
+    });
+  }, [tours, selectedDestinations, selectedCategories, searchText, locale]);
+
+  // ✅ ترتيب الرحلات بشكل آمن
+  const sortedTours = useMemo(() => {
+    let sorted = [...filteredTours];
+    if (sortBy === "alphabetical") {
+      sorted.sort((a, b) => {
+        const aTitle =
+          typeof a.title === "string"
+            ? a.title
+            : a.title?.[locale] || a.title?.en || "";
+        const bTitle =
+          typeof b.title === "string"
+            ? b.title
+            : b.title?.[locale] || b.title?.en || "";
+        return aTitle.localeCompare(bTitle);
+      });
+    } else if (sortBy === "price") {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "duration") {
+      sorted.sort((a, b) => a.duration - b.duration);
+    } else if (sortBy === "popular") {
+      sorted.sort((a, b) => (b.reviewsCount || 0) - (a.reviewsCount || 0));
+    }
+    return sorted;
+  }, [filteredTours, sortBy, locale]);
+  // ------------------------------------------------------------
+  // ✅ حساب الصور الافتراضية
+  const city = cityFromQuery;
+  const category = categoryFromQuery;
+
+  let imagePath;
+  if (city === "All" && category === "All") {
+    imagePath = defaultImage;
+  } else if (city === "All") {
+    imagePath = categoryImages[category] || defaultImage;
+  } else if (category === "All") {
+    imagePath = cityImages[city] || defaultImage;
+  } else {
+    imagePath = cityImages[city] || categoryImages[category] || defaultImage;
+  }
+
+  // ------------------------------------------------------------
+  // ✅ حساب عدد الرحلات لكل مدينة وفئة
+  const cityCounts = useMemo(() => {
+    if (!tours || tours.length === 0) return {};
+    const counts = {};
+    tours.forEach((tour) => {
+      (tour.cities || []).forEach((c) => {
+        const englishName = normalizeToEnglish(c.name); // ✅ استخدم c.name مباشرة
+        if (englishName) {
+          counts[englishName] = (counts[englishName] || 0) + 1;
+        }
+      });
+    });
+    return counts;
+  }, [tours]);
+
+  const categoryCounts = useMemo(() => {
+    if (!tours || tours.length === 0) return {};
+    const counts = {};
+    tours.forEach((tour) => {
+      (tour.categories || []).forEach((cat) => {
+        const englishKey = normalizeToEnglish(cat.name); // ✅ نفس منطق المدن
+        if (englishKey) {
+          counts[englishKey] = (counts[englishKey] || 0) + 1;
+        }
+      });
+    });
+    return counts;
+  }, [tours]);
+
+  useEffect(() => {
+    if (tours && tours.length > 0) {
+      const allCities = Array.from(
+        new Set(
+          tours
+            .map((tour) => {
+              const raw = tour?.city?.name ?? tour?.city ?? "";
+              return typeof raw === "string" ? raw.trim().toLowerCase() : "";
+            })
+            .filter(Boolean),
+        ),
+      );
+      setSelectedDestinations(allCities); // ✅ حط كل المدن في الـ state
+    }
+  }, [tours]);
+  useEffect(() => {
+    if (tours && tours.length > 0) {
+      const allCategories = Array.from(
+        new Set(
+          tours
+            .map((tour) => {
+              const raw = tour?.category?.name ?? tour?.category ?? "";
+              return typeof raw === "string" ? raw.trim().toLowerCase() : "";
+            })
+            .filter(Boolean),
+        ),
+      );
+      // لو selectedCategories فاضي → املاه بكل الفئات
+      if (selectedCategories.length === 0) {
+        setSelectedCategories(allCategories);
+      }
+    }
+  }, [tours]);
+
+  // ------------------------------------------------------------
+  let sortedVisibleTours = [...visibleTours];
+
+  if (sortBy === "alphabetical") {
+    sortedVisibleTours.sort((a, b) => a.title.localeCompare(b.title));
+  } else if (sortBy === "price") {
+    sortedVisibleTours.sort((a, b) => a.price - b.price);
+  } else if (sortBy === "duration") {
+    sortedVisibleTours.sort((a, b) => a.duration - b.duration);
+  } else if (sortBy === "popular") {
+    sortedVisibleTours.sort((a, b) => b.reviewsCount - a.reviewsCount);
+  }
+
+  // ------------------------------------------------------------
+
+  return (
+    <FilterContext.Provider
+      value={{
+        // الحالات
+        selectedDestinations,
+        setSelectedDestinations,
+        selectedCategories,
+        setSelectedCategories,
+        priceRange,
+        setPriceRange,
+        durationRange,
+        setDurationRange,
+        date,
+        setDate,
+        searchText,
+        setSearchText,
+
+        // Popover للمدة
+        openDuration,
+        anchorElDuration,
+        handleDurationClick,
+        handleDurationClose,
+
+        // Popover للسعر
+        openPrice,
+        anchorElPrice,
+        handlePriceClick,
+        handlePriceClose,
+
+        // الدوال
+        updateQueryParams,
+        handleSearch,
+        validateFields,
+        handleToggleCity,
+        handleToggleCategory,
+        handleToggle,
+        openDrawer,
+        setOpenDrawer,
+        viewMode,
+        setViewMode,
+        currentPage,
+        setCurrentPage,
+        itemsPerPage,
+        sortBy,
+        setSortBy,
+        // النتائج
+        filteredTours,
+        visibleTours,
+        cityCounts,
+        categoryCounts,
+        expandedCategories,
+        setExpandedCategories,
+        sortedTours, // ✅ أضفناها هنا
+        // القيم الأصلية من الكويري
+        cityFromQuery,
+        categoryFromQuery,
+        dateFromQuery,
+        minPrice,
+        maxPrice,
+        durationFromQuery,
+        city,
+        category,
+        setExpanded,
+        expanded,
+        imagePath,
+      }}
+    >
+      {children}
+    </FilterContext.Provider>
+  );
+};
+
+// ✅ Hook مخصص للوصول إلى السياق بسهولة
+export const useFilterContext = () => useContext(FilterContext);

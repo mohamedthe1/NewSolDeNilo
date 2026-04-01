@@ -1,0 +1,17 @@
+/* =========================
+   Social Icons
+   ========================= */
+.social-icon {
+  font-size: 22px;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  transition: 0.3s;
+}
+
+.social-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(5px);
+}

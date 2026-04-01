@@ -1,0 +1,21 @@
+/* =========================
+   Scrollbar Styles
+   ========================= */
+::-webkit-scrollbar {
+  width: 8px;              /* عرض الشريط */
+  height: 8px;             /* لو فيه scroll أفقي */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important; /* خلفية الشريط */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FF9800 !important;     /* اللون الذهبي */
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF9800;                /* نفس اللون عند hover */
+}

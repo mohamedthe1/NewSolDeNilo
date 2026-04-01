@@ -1,0 +1,49 @@
+/* =========================
+   Animations
+   ========================= */
+@keyframes heroZoom {
+  0% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fade {
+  0% { opacity: 0; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fillLine {
+  0% { transform: scaleX(0); transform-origin: left; }
+  100% { transform: scaleX(1); transform-origin: left; }
+}
+
+.animate-fade {
+  animation: fade 1.5s ease-in-out;
+}
+.animate-fill-fast {
+  animation: fillLine 0.8s ease-out forwards;
+}
+.animate-fill-medium {
+  animation: fillLine 1.1s ease-out forwards;
+}
+.animate-fill-slow {
+  animation: fillLine 1.4s ease-out forwards;
+}
+
+/* Utilities Layer */
+@layer utilities {
+  @keyframes fadeScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-fadeScale {
+    animation: fadeScale 0.5s ease-out forwards;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .animate-slideIn {
+    animation: slideIn 0.5s ease-out forwards;
+  }
+}

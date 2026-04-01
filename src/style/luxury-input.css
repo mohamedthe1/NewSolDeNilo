@@ -1,0 +1,51 @@
+/* =========================
+   Luxury Input Styles
+   ========================= */
+.luxury-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 14px;
+  padding: 19px 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #b9972f;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid #b9972f;
+  transition: all 0.3s ease;
+}
+
+.luxury-input:hover {
+  border-color: #b9972f;
+  box-shadow: 0 0 12px rgba(201, 163, 74, 0.3);
+}
+
+.luxury-label {
+  position: absolute;
+  top: 50%;
+  left: 18px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #b9972f;
+  transition: 0.3s ease;
+  pointer-events: none;
+}
+
+.luxury-label.active {
+  top: 6px;
+  font-size: 12px;
+  color: #b9972f;
+}
+
+.luxury-value {
+  flex: 1;
+  color: var(--color);
+  font-weight: 600;
+}
+
+.luxury-icon {
+  margin-left: auto;
+  font-size: 18px;
+  color: var(--color);
+}

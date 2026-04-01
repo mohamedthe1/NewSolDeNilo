@@ -1,0 +1,24 @@
+/* النص داخل الـ Select */
+.MuiSelect-select {
+  color: #FF9800 !important; /* اللون اللي تريده */
+  font-weight: 600 !important;
+}
+
+/* السهم */
+.MuiSelect-icon {
+  color: #999 !important;
+}
+
+/* القائمة المنسدلة (MenuItem) */
+.MuiMenuItem-root {
+  color: #FF9800 !important; /* لون النص داخل القائمة */
+  font-weight: 500 !important;
+}
+.MuiMenuItem-root:hover {
+  background: linear-gradient(to right, #fff3e0, #ffe0b2) !important;
+  color: #FF9800 !important;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #FF9800; /* اللون البرتقالي */
+}

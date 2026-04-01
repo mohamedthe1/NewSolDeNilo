@@ -1,0 +1,132 @@
+
+// generator client {
+//   provider = "prisma-client-js"
+//   output   = "../src/generated/prisma"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// enum Role {
+//   USER
+//   ADMIN
+// }
+
+// model User {
+//   id          String        @id @default(cuid())
+//   email       String        @unique
+//   name        String        @db.VarChar(100)
+//   password    String
+//   isActive    Boolean       @default(true)
+//   role        Role          @default(USER)
+//   comments    Comment[]
+//   tripBooking TripBooking[]
+//   createdAt   DateTime      @default(now())
+//   updatedAt   DateTime      @updatedAt
+// }
+
+// model Tour {
+//   id                   String        @id @default(uuid())
+//   title                String
+//   description          String
+//   price                Float
+//   DayPeople            String
+//   Destination          String?
+//   NumberOfParticipants String?
+//   TripDuration         String?
+//   theDate              String?
+//   includes             Includes[]
+//   image                String[]
+//   categoryId           String
+//   category             Category      @relation(fields: [categoryId], references: [id])
+//   cityId               String
+//   city                 City          @relation(fields: [cityId], references: [id])
+//   comments             Comment[]
+//   tripprogram          TripProgram[]
+//   tripBooking          TripBooking[]
+//   iamgeName IamgeName[]
+//   createdAt DateTime    @default(now())
+//   updatedAt DateTime    @updatedAt
+// }
+
+// model Category {
+//   id    String @id @default(uuid())
+//   name  String
+//   tours Tour[]
+// }
+
+// model City {
+//   id    String @id @default(uuid())
+//   name  String
+//   tours Tour[]
+// }
+
+// model TripProgram {
+//   id      String @id @default(uuid())
+//   time    String
+//   program String
+//   tourId  String
+//   tour    Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+// }
+
+// model Includes {
+//   id     String @id @default(uuid())
+//   text   String
+//   tourId String
+//   tour   Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+// }
+
+// // model Comment {
+// //   id        Int      @id @default(autoincrement())
+// //   name      String
+// //   content   String
+// //   star      String
+// //   createdAt DateTime @default(now())
+// //   userId    String
+// //   tourId    String
+// //   user      User     @relation(fields: [userId], references: [id])
+// //   tour      Tour     @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+// //   @@unique([userId, tourId])
+// // }
+
+// model TripBooking {
+//   id String @id @default(uuid())
+
+//   userId String
+//   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+//   tourId String
+//   tour   Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+//   fullName String
+//   email    String
+//   phone    String
+
+//   people        Int
+//   hasChildren   Boolean
+//   childrenCount Int
+//   childrenAges  Json
+
+//   hasPets       Boolean
+//   petType       String
+//   customPetType String?
+
+//   guideRequired  Boolean
+//   guideLanguages Json
+
+//   needsTaxi   Boolean
+//   vehicleType String?
+
+//   paymentMethod String
+//   paymentStatus String
+//   transactionId String?
+
+//   totalPrice Float
+//   currency   String
+
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }

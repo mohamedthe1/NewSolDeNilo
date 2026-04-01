@@ -1,0 +1,108 @@
+/* =========================
+   React DatePicker Customization
+   ========================= */
+
+/* خلفية الجدول */
+.react-datepicker {
+  background: rgba(20, 20, 20, 0.85);
+  border-radius: 16px;
+  border: 1px solid #FF9800;
+  backdrop-filter: blur(12px);
+  padding: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* رأس الجدول (الشهور والسنة) */
+.react-datepicker__header {
+  background: linear-gradient(to right, #FF9800, #FF9800) !important;
+  color: #FF9800 !important;
+  border-radius: 12px;
+  padding: 8px;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* أسماء الشهر والسنة */
+.react-datepicker__current-month {
+  color: #fff !important;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* أسماء الأيام */
+.react-datepicker__day-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #FF9800 !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 4px;
+}
+
+/* الأيام */
+.react-datepicker__day {
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #FF9800 !important;
+  transition: all 0.25s ease;
+}
+
+/* اليوم الحالي */
+.react-datepicker__day--today {
+  border: 1px solid #FF9800;
+  color: #FF9800;
+  font-weight: 700;
+}
+
+/* اليوم المختار */
+.react-datepicker__day--selected {
+  background: linear-gradient(to right, #FF9800, #FF9800);
+  color: #FF9800;
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(201, 163, 74, 0.3);
+}
+
+/* Hover */
+.react-datepicker__day:hover {
+  background: linear-gradient(to right, #fff8e1, #FF9800);
+  color: #FF9800;
+  transform: scale(1.05);
+}
+
+/* الأيام الخاصة */
+.special-day {
+  background: linear-gradient(to right, #c9a34a, #FF9800) !important;
+  color: #fff !important;
+  border-radius: 50% !important;
+  position: relative;
+}
+.special-day::after {
+  content: "★";
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  font-size: 12px;
+  color: #fff;
+}
+
+/* الأيام الممنوعة */
+.react-datepicker__day--disabled {
+  color: #999 !important;
+  background: rgba(0,0,0,0.1) !important;
+  border-radius: 8px;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+}
+.react-datepicker__day--disabled:hover {
+  background: rgba(0,0,0,0.15) !important;
+  color: #aaa !important;
+  transform: none !important;
+  box-shadow: none !important;
+}

@@ -1,0 +1,20 @@
+/* =========================
+   Swiper Customization
+   ========================= */
+
+/* ✅ تغيير لون الأسهم */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #FF9800 !important; /* اللون الذهبي */
+}
+
+/* ✅ تغيير لون النقاط */
+.swiper-pagination-bullet {
+  background: #FF9800 !important; /* اللون الذهبي */
+  opacity: 0.6; /* شفافية بسيطة */
+}
+
+.swiper-pagination-bullet-active {
+  background: #FF9800 !important; /* نفس اللون لكن أوضح */
+  opacity: 1;
+}
